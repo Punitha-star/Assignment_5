@@ -1,32 +1,33 @@
 # =========================================================
-# DRIVER DROWSINESS DETECTION USING CNN TRAIN MODEL
+# DRIVER DROWSINESS DETECTION USING CNN
+# TRAIN MODEL
 # =========================================================
 
-import torch #PyTorch main library.
-import torch.nn as nn #Used to create CNN layers.nn.Conv2d(),nn.Conv1d(),nn.MaxPool2d()
-import torch.optim as optim#Used to update model weights during training.
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
-import torchvision.transforms as transforms #Used for image preprocessing before sending images to the CNN.
+import torchvision.transforms as transforms
 
-from torchvision import datasets #Used to load image datasets.
+from torchvision import datasets
 
-from torch.utils.data import random_split #Used to divide dataset into training and test
+from torch.utils.data import random_split
 
 import matplotlib.pyplot as plt
 
 # =========================================================
 # IMAGE TRANSFORM
 # =========================================================
-#It combines multiple image transformations into one pipeline.originall-grayscale-resize-tensor-normalize, CNN
+
 transform_value = transforms.Compose([
 
-    transforms.Grayscale(),#Less computation
+    transforms.Grayscale(),
 
-    transforms.Resize((28,28)),#Convert all images to the same size.
+    transforms.Resize((28,28)),
 
-    transforms.ToTensor(),#Convert image into tensor format.[Channels, Height, Width]
+    transforms.ToTensor(),
 
-    transforms.Normalize((0.5,), (0.5,))#Scale pixel values to a standard range.
+    transforms.Normalize((0.5,), (0.5,))
 
 ])
 
@@ -34,15 +35,13 @@ transform_value = transforms.Compose([
 # LOAD DATASET
 # =========================================================
 
-full_dataset = datasets.ImageFolder(  #Then automatically creates labels, datasets.Imagefolder() pythorch functional
+full_dataset = datasets.ImageFolder(
 
     root='dataset/train',
 
-    transform=transform_value #This applies preprocessing to every image.
+    transform=transform_value
+
 )
-print(len(full_dataset))
-print(full_dataset.classes)
-print(full_dataset.class_to_idx)
 
 # =========================================================
 # SPLIT TRAIN / TEST
@@ -92,21 +91,21 @@ class CNN(nn.Module):
 
     def __init__(self):
 
-        super().__init__()#Initializes the parent neural network class.,initializes the PyTorch neural network module.
+        super().__init__()
 
         self.conv1 = nn.Conv2d(
 
-            in_channels=1,#grayscale image
+            in_channels=1,
 
-            out_channels=32,#32 filters
+            out_channels=32,
 
-            kernel_size=3,#Filter size = 3×3
+            kernel_size=3,
 
-            padding=1#Padding keeps image size unchanged #Conv1 extracts low-level features such as edges, eye shapes, and mouth patterns.
+            padding=1
 
         )
 
-        self.pool = nn.MaxPool2d( #max Pooling reduces feature map size while preserving important information.
+        self.pool = nn.MaxPool2d(
 
             kernel_size=2,
 
@@ -114,7 +113,7 @@ class CNN(nn.Module):
 
         )
 
-        self.conv2 = nn.Conv2d(#Conv2 extracts deeper features such as eye closure and yawning patterns.
+        self.conv2 = nn.Conv2d(
 
             in_channels=32,
 
@@ -126,7 +125,7 @@ class CNN(nn.Module):
 
         )
 
-        self.fc1 = nn.Linear(#Fully Connected Layer FC1 learns relationships between extracted features and reduces them to 128 neurons.
+        self.fc1 = nn.Linear(
 
             7 * 7 * 64,
 
@@ -134,7 +133,7 @@ class CNN(nn.Module):
 
         )
 
-        self.fc2 = nn.Linear(#FC2 produces probabilities for the four output classes.
+        self.fc2 = nn.Linear(
 
             128,
 
@@ -196,7 +195,7 @@ optimizer = optim.Adam(
 
     model.parameters(),
 
-    lr=0.001
+    lr=0.01
 
 )
 
@@ -204,7 +203,7 @@ optimizer = optim.Adam(
 # TRAINING
 # =========================================================
 
-epochs = 5
+epochs = 15
 
 train_loss = []
 
